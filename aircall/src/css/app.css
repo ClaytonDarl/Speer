@@ -8,6 +8,22 @@
   right: 0;
   bottom: 0;
 }
+.CallType {
+  display: block;
+  width: 100px; height: 25px;
+  padding-left: 20px;
+}
+
+.cellRow { 
+  display: grid; 
+  grid-template-columns: repeat(3, 1fr); 
+  grid-template-rows: 1fr; 
+  grid-column-gap: 3px;
+  grid-row-gap: 0px; 
+  }
+  .div1 { grid-area: 1 / 1 / 2 / 2; } 
+  .div2 { grid-area: 1 / 2 / 2 / 3; } 
+  .div3 { grid-area: 1 / 3 / 2 / 4; }
 
 #app .container {
   width: 376px;
@@ -27,16 +43,16 @@
   align-items: center;
 }
 
-#primaryInfo {
-  align-items: center;
+#primaryInfo, #secondaryInfo {
+  text-align: center;
 }
 
 #secondayInfo {
-  align-items: center;
+  text-align: center;
 }
 
 ul {
-  padding-bottom: 20px;
+  padding-bottom: 10px;
 }
 
 li {
@@ -55,15 +71,23 @@ li {
 }
 
 .archiveAll {
-  background:rgba(0, 117, 0, 1);
-  border-radius: 10px;
+  background:rgb(40, 107, 9);
+  color: white;
+  font-size: 20px;
+  padding: 0px 0px;
+  border-radius: 5px;
   height: auto;
   width: 10em;
+  cursor: pointer;
 }
 
 .singleArchive {
   background: rgba(114, 231, 114, 1);
-  border-radius: 15px;
+  color: black;
+  font-size: 10px;
+  height: auto;
+  cursor: pointer;
+  border-radius: 5px;
 }
 
 .buttonContainer {
