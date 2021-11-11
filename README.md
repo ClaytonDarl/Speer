@@ -1,2 +1,0 @@
-# Speer
-Speer Technical
