@@ -2,18 +2,31 @@ import React, {useEffect, useState} from 'react';
 import ReactDOM from 'react-dom';
 
 import Header from './Header.jsx';
-
-//Archive a single call record - Sending a boolean unsure as to why the server doesnt accept it
+/**
+ * 
+ * @param {*} props A record of an actiity and its contents
+ * 
+ * sends a request to the server to change the is_archived property to true
+ * 
+ * TODO: Currently the request is sent but gets rejected as the is_archived is not a boolean?
+ */
 function archive(props) {
+
+  //Create the request options here, is_archived is the only data being changed
   const requestOptions = {
     method: 'POST',
-    body_params: {"is_archived": true}
+    headers: {
+      'Content-Type': 'applcation/json'
+    },
+    body: {
+      is_archived: true
+    }
   };
-
-  fetch(`https://aircall-job.herokuapp.com/activities/${props.id}`, requestOptions)
+  
+  //send the request
+  fetch(`https://aircall-job.herokuapp.com/activities/${props}`, requestOptions)
   .then(response => response.json())
   .then((json) => {
-    console.log(json)
     return json
   })
   .cath((error) => {
@@ -21,12 +34,41 @@ function archive(props) {
   });
 }
 
-//Separate component for the displaying call information, allows for easier deign alterations
-function CallCell(props) {
-  var callType = ""
+/**
+ * 
+ * @param {*} props A list of all activities currently present on the application
+ * 
+ * Takes every activity present and sets the archive value to true
+ */
+function archiveAll(props) {
+  console.log(props);
+  for (let x = 0; x < props.length; x++) {
+    archive(props[x].id);
+  }
+}
 
+/**
+ * Display component for each activity that gets returned from the api call.
+ */
+class CallCell extends React.Component {
+  constructor (props) {
+    super(props);
+    this.state = {
+      id: props.id,
+      direction: props.direction,
+      from: props.from,
+      via: props.via,
+      type: props.type,
+      archived: props.is_archive
+    }
+  }
+  render (){
+    if (this.state.archived) {
+      return (null);
+    }
+    var callType = "";
   //Add specific SVG for each call type
-  if (props.type == 'missed') {
+  if (this.state.type == 'missed') {
     callType = <div>
       <svg className="CallType" width='50px' height='25px' viewBox='0 0 486 168' version='1.1' xmlns='http://www.w3.org/2000/svg'>
         <g stroke='none' strokeWidth='1' fill='none' fillRule='evenodd'>
@@ -35,7 +77,7 @@ function CallCell(props) {
       </svg>
       <h2 style={{textAlign: 'center'}}>Missed</h2>
     </div>;
-  } else if (props.type == 'answered') {
+  } else if (this.state.type == 'answered') {
     callType = <div>
     <svg className="CallType" width='50px' height='25px' viewBox='0 0 486 168' version='1.1' xmlns='http://www.w3.org/2000/svg'>
       <g stroke='none' strokeWidth='1' fill='none' fillRule='evenodd'>
@@ -54,22 +96,20 @@ function CallCell(props) {
     <h2 style={{textAlign: 'center'}}>Voicemail</h2>
     </div>;
   }
-  
+
   return (
     <div className='cellContainer'>
-      <div class="cellRow"> 
-        <div class="col1"> {callType}</div> 
-        <div class="col2"> <h1 className='primaryInfo'>, {props.direction} call from {props.from} </h1> </div> 
-        <div class="col3"> <h2 className='secondaryInfo'> Call attempted from {props.via}</h2> </div> 
+      <div className="cellRow"> 
+        <div> {callType}</div> 
+        <div> <h1 className='primaryInfo'>{this.state.direction} call from {this.state.from} </h1> </div> 
+        <div> <h2 className='secondaryInfo'> Call attempted from {this.state.via}</h2> </div> 
       </div>
       <div className="buttonContainer">
-        <button className="singleArchive">Archive Me!</button>
+        <button className="singleArchive" onClick={() => this.setState({archived: true}, archive(this.state.id))}>Archive Me!</button>
       </div>
-      
-      <br>
-      </br>
     </div>
   );
+  }
 }
 
 class MyComponent extends React.Component {
@@ -78,7 +118,7 @@ class MyComponent extends React.Component {
     this.state = {
       error: null,
       isLoaded: false,
-      items: []
+      items: [],
     };
   }
 
@@ -130,22 +170,22 @@ class MyComponent extends React.Component {
       return <div>Loading...</div>;
     } else {
       return (
-        <div style={{left: "50%", top: "50%"}}>
+          <div style={{left: "50%", top: "50%"}}>
+            <button className="archivedList" onClick={()=>console.log("this is where I would render a new tab for archived calls")}>View Archived Calls</button>
+          <ul >
+            {this.state.items.map(item => (
+              <li key={item.id}>
+                <CallCell from= {item.from} type = {item.call_type} direction={item.direction} via={item.via} id={item.id}/>
+              </li>
+            ))}
+          </ul>
+          <br></br>
+          <div className="archiveAllContainer"style={{display: "flex", justifyContent: "center"}}>
+            <button className="archiveAll" onClick={() => archiveAll(this.state.items)}>Archieve All</button>
+            <button className="refresh" onClick={() => this.update()}> Refresh Call List</button>
+          </div>
           
-        <ul >
-          {this.state.items.map(item => (
-            <li key={item.id}>
-              <CallCell from= {item.from} type = {item.call_type} direction={item.direction} via={item.via} id={item.id}/>
-            </li>
-          ))}
-        </ul>
-        <br></br>
-        <div className="archiveAllContainer"style={{display: "flex", justifyContent: "center"}}>
-          <button className="archiveAll" onClick={() => archive(this.state.items[0])}>Archieve All</button>
-          <button className="refresh" onClick={() => this.update()}> Refresh Call List</button>
-        </div>
-        
-        </div>
+          </div>
       );
     }
   }

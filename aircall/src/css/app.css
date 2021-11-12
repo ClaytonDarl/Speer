@@ -70,7 +70,7 @@ li {
   height: 35px;
 }
 
-.archiveAll {
+.archiveAll, .refresh {
   background:rgb(40, 107, 9);
   color: white;
   font-size: 20px;
@@ -79,6 +79,10 @@ li {
   height: auto;
   width: 10em;
   cursor: pointer;
+}
+
+.refresh {
+  background: rgba(216, 55, 55, 0.87)
 }
 
 .singleArchive {
@@ -101,4 +105,9 @@ li {
 
 .secondaryInfo {
   color:rgba(0, 0, 0, 0.5);
+}
+
+.archivedList {
+  background: lightgray;
+  text-align: center;
 }
